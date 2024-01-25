@@ -13,8 +13,8 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
  */
 
  const textureLoader = new THREE.TextureLoader()
-
  const woodTexture = textureLoader.load('/textures/wood.jpg')
+ const blueMistTexture = textureLoader.load('/textures/blueMist.jpg')
 
 /**
  * Renderer
@@ -31,18 +31,25 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 /**
  * Meshes
  */
-const icosahedronGeometry = new THREE.IcosahedronGeometry(1)
-const material = new THREE.MeshBasicMaterial({ map: woodTexture })
 
-const icosahedron = new THREE.Mesh(icosahedronGeometry, material)
+// Dice
+const diceGeometry = new THREE.IcosahedronGeometry(1)
+const diceMaterial = new THREE.MeshBasicMaterial({ map: blueMistTexture })
+const dice = new THREE.Mesh(diceGeometry, diceMaterial)
+dice.position.set(0, 0, 10)
+scene.add(dice)
 
-scene.add(icosahedron)
+// Table
+const tableGeometry = new THREE.PlaneGeometry(30, 30)
+const tableMaterial = new THREE.MeshBasicMaterial({ map: woodTexture })
+const table = new THREE.Mesh(tableGeometry, tableMaterial)
+scene.add(table)
 
 /**
  * Camera
  */
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-camera.position.z = 5
+camera.position.z = 15
 scene.add(camera)
 
 /** 
