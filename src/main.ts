@@ -105,6 +105,10 @@ icosahedronBody.addShape(icosahedronShape)
 icosahedronBody.position.x = dice.position.x
 icosahedronBody.position.y = dice.position.y
 icosahedronBody.position.z = dice.position.z
+icosahedronBody.applyLocalForce(
+  new CANNON.Vec3(Math.random() * 20, Math.random() * 20, 0),
+  icosahedronBody.position
+)
 world.addBody(icosahedronBody)
 
 
