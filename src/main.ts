@@ -55,7 +55,6 @@ const diceMaterial = new THREE.MeshBasicMaterial({
 const dice = new THREE.Mesh(diceGeometry, diceMaterial)
 dice.position.set(0, 0, 10)
 dice.up.set(0, 0, 1)
-diceGeometry.rotateY((Math.random() - Math.PI) * Math.PI)
 scene.add(dice)
 
 // Dice Faces
@@ -67,6 +66,8 @@ const uvs = new Float32Array([
   0.0, 0.0,
 ]);
 
+const facesGroup = new THREE.Group()
+
 for (let i = 0; i < dicePositions.length; i += 3) {
   dicePoints.push(
     new THREE.Vector3(dicePositions[i], dicePositions[i + 1], dicePositions[i + 2])
@@ -74,6 +75,7 @@ for (let i = 0; i < dicePositions.length; i += 3) {
 }
 for (let i = 0; i < dicePositions.length / 3; i += 3) {
   const faceNumber = i / 3 + 1
+  const faceName = faceNumber.toString()
   const canvas = document.createElement("canvas")
   const context = canvas.getContext("2d")!
   canvas.width = canvas.height = 60
@@ -83,7 +85,7 @@ for (let i = 0; i < dicePositions.length / 3; i += 3) {
   context.textAlign = "center";
   context.textBaseline = "middle";
   context.fillStyle = "#000000";
-  context.fillText(faceNumber.toString(), canvas.width / 2, canvas.height * 3 / 4)
+  context.fillText(faceName, canvas.width / 2, canvas.height * 3 / 4)
   const numberedFaceTexture = new THREE.CanvasTexture(canvas)
 
   const material = new THREE.MeshBasicMaterial({ map: numberedFaceTexture })
@@ -92,8 +94,10 @@ for (let i = 0; i < dicePositions.length / 3; i += 3) {
   geometry.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
 
   const faceMesh = new THREE.Mesh(geometry, material)
-  dice.add(faceMesh)
+  faceMesh.name = faceName
+  facesGroup.add(faceMesh)
 }
+dice.add(facesGroup)
 
 // Table
 const tableGeometry = new THREE.PlaneGeometry(50, 50)
@@ -244,12 +248,18 @@ const update = () => {
         previousPositionCount = 0
       }
 
-      const hasDiceStopped = previousPositionCount > 200
-      if (hasDiceStopped) {
-        const resultTextHtml = document.getElementById('result-text') as HTMLElement
-        resultTextHtml.innerText = 'RESULT'
-      }
+      const hasDiceStopped = previousPositionCount > 100
 
+      if (hasDiceStopped) {
+        const rayCasterOrigin = new THREE.Vector3(dice.position.x, dice.position.y, 15)
+        const rayCasterDirection = new THREE.Vector3(0, 0, -1)
+        const raycaster = new THREE.Raycaster(rayCasterOrigin, rayCasterDirection)
+
+        const intersects = raycaster.intersectObjects(facesGroup.children)
+        const resultTextHtml = document.getElementById('result-text') as HTMLElement
+        resultTextHtml.innerText = `Result: ${intersects[0].object.name}`
+
+      }
 
       // Render
       renderer.render(scene, camera)
