@@ -38,6 +38,7 @@ const diceGeometry = new THREE.IcosahedronGeometry(1)
 const diceMaterial = new THREE.MeshBasicMaterial({ map: blueMistTexture })
 const dice = new THREE.Mesh(diceGeometry, diceMaterial)
 dice.position.set(0, 0, 10)
+dice.up.set(0, 0, 1)
 diceGeometry.rotateY((Math.random() - Math.PI) * Math.PI)
 scene.add(dice)
 
@@ -51,7 +52,8 @@ scene.add(table)
  * Camera
  */
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-camera.position.set(0, -5, 15)
+camera.position.set(0, -10, 15)
+camera.up.set(0, 0, 1)
 scene.add(camera)
 
 /** 
