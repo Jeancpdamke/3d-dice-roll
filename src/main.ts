@@ -22,6 +22,10 @@ const CAMERA_Z_DISTANCE = 15
 
  const textureLoader = new THREE.TextureLoader()
  const woodTexture = textureLoader.load('/textures/wood.jpg')
+ woodTexture.repeat.set(2, 1)
+ woodTexture.wrapS = THREE.RepeatWrapping;
+ woodTexture.wrapT = THREE.RepeatWrapping;
+
  const blueMistTexture = textureLoader.load('/textures/blueMist.jpg')
 
 /**
@@ -50,7 +54,7 @@ diceGeometry.rotateY((Math.random() - Math.PI) * Math.PI)
 scene.add(dice)
 
 // Table
-const tableGeometry = new THREE.PlaneGeometry(30, 30)
+const tableGeometry = new THREE.PlaneGeometry(50, 50)
 const tableMaterial = new THREE.MeshBasicMaterial({ map: woodTexture })
 const table = new THREE.Mesh(tableGeometry, tableMaterial)
 scene.add(table)
@@ -85,7 +89,7 @@ const defaultCannonContactMaterial = new CANNON.ContactMaterial(
     defaultCannonMaterial,
     {
         friction: 0.2,
-        restitution: 0.7
+        restitution: 0.6
     }
 )
 world.addContactMaterial(defaultCannonContactMaterial)
