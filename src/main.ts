@@ -4,10 +4,17 @@ import * as THREE from 'three'
 import CANNON from 'cannon'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
+
  const sizes = {
   width: window.innerWidth,
   height: window.innerHeight
 }
+
+/**
+ * Constants
+ */
+const CAMERA_Y_DISTANCE = -10
+const CAMERA_Z_DISTANCE = 15
 
 /**
  * Textures
@@ -52,7 +59,7 @@ scene.add(table)
  * Camera
  */
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-camera.position.set(0, -10, 15)
+camera.position.set(0, CAMERA_Y_DISTANCE, CAMERA_Z_DISTANCE)
 camera.up.set(0, 0, 1)
 scene.add(camera)
 
@@ -167,6 +174,11 @@ const update = () => {
       )
 
       // Update camera to follow the dice
+      camera.position.set(
+        icosahedronBody.position.x,
+        icosahedronBody.position.y - CAMERA_Y_DISTANCE,
+        CAMERA_Z_DISTANCE
+      )
       camera.lookAt(dice.position)
 
       // Render
