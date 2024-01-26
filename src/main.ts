@@ -74,7 +74,6 @@ for (let i = 0; i < dicePositions.length; i += 3) {
 }
 for (let i = 0; i < dicePositions.length / 3; i += 3) {
   const faceNumber = i / 3 + 1
-  console.log("faceNumber:", faceNumber);
   const canvas = document.createElement("canvas")
   const context = canvas.getContext("2d")!
   canvas.width = canvas.height = 60
@@ -192,6 +191,16 @@ window.addEventListener('resize', () =>
  */
 const clock = new THREE.Clock()
 let oldElapsedTime = 0
+let previousRotation = new CANNON.Quaternion
+let previousPositionCount = 0
+
+const areRotationsAlmostEqual = (vector1: CANNON.Quaternion, vector2: CANNON.Quaternion, precision = 0.001): boolean => {
+  const isXInsidePrecision = vector1.x - vector2.x < precision
+  const isYInsidePrecision = vector1.y - vector2.y < precision
+  const isZInsidePrecision = vector1.z - vector2.z < precision
+  const isWInsidePrecision = vector1.w - vector2.w < precision
+  return isXInsidePrecision && isYInsidePrecision && isZInsidePrecision && isWInsidePrecision
+}
 
 const update = () => {
       // Update controls
@@ -226,6 +235,21 @@ const update = () => {
         CAMERA_Z_DISTANCE
       )
       camera.lookAt(dice.position)
+
+      // Check if dice stopped
+      if (areRotationsAlmostEqual(previousRotation, icosahedronBody.quaternion)) {
+        previousPositionCount++
+      } else {
+        previousRotation.copy(icosahedronBody.quaternion)
+        previousPositionCount = 0
+      }
+
+      const hasDiceStopped = previousPositionCount > 200
+      if (hasDiceStopped) {
+        const resultTextHtml = document.getElementById('result-text') as HTMLElement
+        resultTextHtml.innerText = 'RESULT'
+      }
+
 
       // Render
       renderer.render(scene, camera)
