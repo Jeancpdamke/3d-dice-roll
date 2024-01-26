@@ -14,7 +14,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
  * Constants
  */
 const CAMERA_Y_DISTANCE = -10
-const CAMERA_Z_DISTANCE = 15
+const CAMERA_Z_DISTANCE = 13
 
 /**
  * Textures
@@ -49,7 +49,7 @@ const diceGeometry = new THREE.IcosahedronGeometry(1)
 const diceMaterial = new THREE.MeshBasicMaterial({
   map: blueMistTexture,
   transparent: true,
-  opacity: 0.7,
+  opacity: 0.4,
   side: THREE.DoubleSide
 })
 const dice = new THREE.Mesh(diceGeometry, diceMaterial)
@@ -57,6 +57,44 @@ dice.position.set(0, 0, 10)
 dice.up.set(0, 0, 1)
 diceGeometry.rotateY((Math.random() - Math.PI) * Math.PI)
 scene.add(dice)
+
+// Dice Faces
+const dicePositions = dice.geometry.attributes.position.array
+const dicePoints = []
+const uvs = new Float32Array([
+  1.0, 0.0,
+  0.5, 1.0,
+  0.0, 0.0,
+]);
+
+for (let i = 0; i < dicePositions.length; i += 3) {
+  dicePoints.push(
+    new THREE.Vector3(dicePositions[i], dicePositions[i + 1], dicePositions[i + 2])
+  )
+}
+for (let i = 0; i < dicePositions.length / 3; i += 3) {
+  const faceNumber = i / 3 + 1
+  console.log("faceNumber:", faceNumber);
+  const canvas = document.createElement("canvas")
+  const context = canvas.getContext("2d")!
+  canvas.width = canvas.height = 60
+  context.font = '20pt arial'
+  context.fillStyle = "#FFFFFF";
+  context.fillRect(0, 0, canvas.width, canvas.height);
+  context.textAlign = "center";
+  context.textBaseline = "middle";
+  context.fillStyle = "#000000";
+  context.fillText(faceNumber.toString(), canvas.width / 2, canvas.height * 3 / 4)
+  const numberedFaceTexture = new THREE.CanvasTexture(canvas)
+
+  const material = new THREE.MeshBasicMaterial({ map: numberedFaceTexture })
+  const geometry = new THREE.BufferGeometry()
+  geometry.setFromPoints([dicePoints[i], dicePoints[i + 1], dicePoints[i + 2]])
+  geometry.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
+
+  const faceMesh = new THREE.Mesh(geometry, material)
+  dice.add(faceMesh)
+}
 
 // Table
 const tableGeometry = new THREE.PlaneGeometry(50, 50)
@@ -101,15 +139,14 @@ world.addContactMaterial(defaultCannonContactMaterial)
 world.defaultContactMaterial = defaultCannonContactMaterial
 
 // CANNON Icosahedron
-const positions = dice.geometry.attributes.position.array
 const icosahedronPoints = []
-for (let i = 0; i < positions.length; i += 3) {
+for (let i = 0; i < dicePositions.length; i += 3) {
   icosahedronPoints.push(
-    new CANNON.Vec3(positions[i], positions[i + 1], positions[i + 2])
+    new CANNON.Vec3(dicePositions[i], dicePositions[i + 1], dicePositions[i + 2])
   )
 }
 const icosahedronFaces = []
-for (let i = 0; i < positions.length / 3; i += 3) {
+for (let i = 0; i < dicePositions.length / 3; i += 3) {
     icosahedronFaces.push([i, i + 1, i + 2])
 }
 const icosahedronShape = new CANNON.ConvexPolyhedron(
