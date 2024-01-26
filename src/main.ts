@@ -46,7 +46,12 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
 // Dice
 const diceGeometry = new THREE.IcosahedronGeometry(1)
-const diceMaterial = new THREE.MeshBasicMaterial({ map: blueMistTexture })
+const diceMaterial = new THREE.MeshBasicMaterial({
+  map: blueMistTexture,
+  transparent: true,
+  opacity: 0.7,
+  side: THREE.DoubleSide
+})
 const dice = new THREE.Mesh(diceGeometry, diceMaterial)
 dice.position.set(0, 0, 10)
 dice.up.set(0, 0, 1)
