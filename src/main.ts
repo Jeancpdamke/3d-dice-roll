@@ -37,8 +37,26 @@ const scene = new THREE.Scene()
 const renderer = new THREE.WebGLRenderer({
   canvas: canvas
 })
+renderer.shadowMap.enabled = true;
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+
+/**
+ * Lights
+ */
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.8)
+scene.add(ambientLight)
+
+const directionalLight = new THREE.DirectionalLight(0xffffff, 0.4)
+directionalLight.castShadow = true
+directionalLight.shadow.mapSize.set(1024, 1024)
+directionalLight.shadow.camera.far = 25
+directionalLight.shadow.camera.left = -25
+directionalLight.shadow.camera.top = 25
+directionalLight.shadow.camera.right = 25
+directionalLight.shadow.camera.bottom = -25
+directionalLight.position.set(0, 0, 20)
+scene.add(directionalLight)
 
 /**
  * Meshes
@@ -46,13 +64,16 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
 // Dice
 const diceGeometry = new THREE.IcosahedronGeometry(1)
-const diceMaterial = new THREE.MeshBasicMaterial({
+const diceMaterial = new THREE.MeshStandardMaterial({
   map: blueMistTexture,
   transparent: true,
-  opacity: 0.4,
-  side: THREE.DoubleSide
+  opacity: 0.6,
+  side: THREE.DoubleSide,
+  metalness: 0.2,
+  roughness: 0.5,
 })
 const dice = new THREE.Mesh(diceGeometry, diceMaterial)
+dice.castShadow = true
 dice.position.set(0, 0, 10)
 dice.up.set(0, 0, 1)
 scene.add(dice)
@@ -101,8 +122,13 @@ dice.add(facesGroup)
 
 // Table
 const tableGeometry = new THREE.PlaneGeometry(50, 50)
-const tableMaterial = new THREE.MeshBasicMaterial({ map: woodTexture })
+const tableMaterial = new THREE.MeshStandardMaterial({
+  map: woodTexture,
+  metalness: 0.2,
+  roughness: 0.5,
+})
 const table = new THREE.Mesh(tableGeometry, tableMaterial)
+table.receiveShadow = true
 scene.add(table)
 
 /**
